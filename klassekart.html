@@ -1,0 +1,2411 @@
+<!DOCTYPE html>
+<html lang="nn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Klassekart-generator 🪑</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Sans+3:wght@300..700&family=JetBrains+Mono:wght@400..700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Lektorodd — Retning A «Trio kald» */
+            --lo-cream: #F6F1E6;
+            --lo-surface: #FCFAF4;
+            --lo-subtle: #EFE9DC;
+            --lo-border: #E8E1D2;
+            --lo-border-strong: #D8D2C4;
+            --lo-ink: #1F2933;
+            --lo-ink-strong: #15202B;
+            --lo-muted: #6B6F77;
+            --lo-blue: #2B6CB0;
+            --lo-blue-dark: #1E4B7B;
+            --lo-green: #276749;
+            --lo-green-dark: #1D4D36;
+            --lo-violet: #805AD5;
+            --lo-red: #C53030;
+            --lo-warn: #B7791F;
+            --lo-mint: #98D3B4;
+            --lo-mint-soft: #9FD8BD;
+            --lo-mint-deep: #86C9A6;
+            --lo-tavle: #15202B;
+            --lo-on-dark: #F7F5EF;
+            --font-display: 'Space Grotesk', 'Source Sans 3', sans-serif;
+            --font-sans: 'Source Sans 3', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { font-size: 17px; }
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--lo-cream);
+            background-image:
+                linear-gradient(rgba(31,41,51,.045) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(31,41,51,.045) 1px, transparent 1px);
+            background-size: 34px 34px;
+            background-attachment: fixed;
+            color: var(--lo-ink);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+        ::selection { background: var(--lo-mint); color: var(--lo-ink-strong); }
+
+        .main-container {
+            position: relative;
+            width: 100%;
+            max-width: 72rem;
+            background-color: var(--lo-surface);
+            border: 1px solid var(--lo-border);
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(2, 6, 23, 0.05);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        header { text-align: center; margin-bottom: 1.5rem; }
+        h1 {
+            font-family: var(--font-display);
+            font-size: 2.4rem;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            line-height: 1.08;
+            color: var(--lo-ink-strong);
+        }
+        h1 .mark, .mark {
+            background: linear-gradient(100deg,
+                rgba(152,211,180,0) 1%,
+                var(--lo-mint-soft) 5%,
+                var(--lo-mint-deep) 95%,
+                rgba(152,211,180,0) 99%);
+            padding: 0 .18em;
+            color: inherit;
+            border-radius: 1px;
+            -webkit-box-decoration-break: clone;
+            box-decoration-break: clone;
+        }
+        header p { margin-top: 0.5rem; color: var(--lo-muted); }
+
+        .guide-box {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background-color: rgba(43, 108, 176, 0.06);
+            border: 1px solid var(--lo-blue);
+            border-left-width: 4px;
+            border-radius: 5px;
+        }
+        .guide-box h2 { font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; letter-spacing: -0.02em; color: var(--lo-ink-strong); margin-bottom: 0.5rem; }
+        .guide-box ol { list-style-position: inside; list-style-type: decimal; padding-left: 0.5rem; }
+        .guide-box li { margin-bottom: 0.25rem; }
+
+        label { display: block; font-weight: 600; margin-bottom: 0.5rem; }
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #fff;
+            color: var(--lo-ink);
+            border: 1px solid var(--lo-border-strong);
+            border-radius: 5px;
+            font-family: var(--font-sans);
+            resize: vertical;
+            min-height: 150px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: var(--lo-blue);
+            box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.2);
+        }
+
+        button {
+            font-family: var(--font-sans);
+            font-weight: 600;
+            padding: 0.7rem 1.5rem;
+            border-radius: 4px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.1s;
+        }
+        button:active { transform: scale(0.98); }
+        .btn-primary { background-color: var(--lo-blue); border-color: var(--lo-blue); color: #fff; }
+        .btn-primary:hover { background-color: var(--lo-blue-dark); border-color: var(--lo-blue-dark); }
+        .btn-secondary { background-color: transparent; border-color: var(--lo-border-strong); color: var(--lo-ink-strong); }
+        .btn-secondary:hover { background-color: var(--lo-subtle); }
+        .btn-green { background-color: var(--lo-green); border-color: var(--lo-green); color: #fff; }
+        .btn-green:hover { background-color: var(--lo-green-dark); border-color: var(--lo-green-dark); }
+
+        #restart-button {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background-color: transparent;
+            border: none;
+            color: var(--lo-muted);
+            padding: 0.5rem;
+            border-radius: 50%;
+        }
+        #restart-button:hover { background-color: var(--lo-subtle); color: var(--lo-ink-strong); }
+
+        .input-tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid var(--lo-border-strong);
+        }
+        .input-tab {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background-color: var(--lo-surface);
+            color: var(--lo-muted);
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: none;
+            border-radius: 0;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .input-tab:not(:last-child) { border-right: 1px solid var(--lo-border-strong); }
+        .input-tab:hover { background-color: var(--lo-subtle); color: var(--lo-ink-strong); }
+        .input-tab.active { background-color: var(--lo-blue); color: white; }
+
+        /* Steg 2: kontrollpanel */
+        .panel {
+            background-color: var(--lo-cream);
+            border: 1px solid var(--lo-border);
+            border-radius: 5px;
+            margin-bottom: 0.6rem;
+        }
+        .panel > summary {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 0.35rem 0.9rem;
+            padding: 0.7rem 1rem;
+            cursor: pointer;
+            list-style: none;
+            border-radius: 5px;
+            transition: background-color 0.15s;
+        }
+        .panel > summary::-webkit-details-marker { display: none; }
+        .panel > summary:hover { background-color: var(--lo-subtle); }
+        .panel > summary::before {
+            content: "";
+            width: 0; height: 0;
+            border-left: 5px solid var(--lo-muted);
+            border-top: 4px solid transparent;
+            border-bottom: 4px solid transparent;
+            margin-right: 0.15rem;
+            transition: transform 0.15s;
+            flex-shrink: 0;
+            align-self: center;
+        }
+        .panel[open] > summary::before { transform: rotate(90deg); }
+        .panel[open] > summary { border-bottom: 1px solid var(--lo-border); border-radius: 5px 5px 0 0; }
+        .panel-title {
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--lo-ink-strong);
+        }
+        .panel-sum {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: var(--lo-muted);
+        }
+        .panel-sum .warn { color: var(--lo-warn); font-weight: 600; }
+        .panel-body { padding: 1rem; }
+        .controls-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem 1.5rem;
+            align-items: flex-end;
+        }
+        .control-item label { font-size: 0.82rem; font-weight: 600; color: var(--lo-muted); margin-bottom: 0.3rem; }
+        input[type="number"], select, input[type="text"] {
+            padding: 0.5rem;
+            background-color: #fff;
+            color: var(--lo-ink);
+            border: 1px solid var(--lo-border-strong);
+            border-radius: 4px;
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+        }
+        input[type="number"]:focus, select:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: var(--lo-blue);
+            box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.2);
+        }
+        input[type="number"] { width: 4.5rem; text-align: center; }
+        select { max-width: 14rem; }
+        input[type="text"] { width: 100%; }
+
+        .preset-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .preset-btn {
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            background-color: var(--lo-surface);
+            color: var(--lo-ink);
+            border: 1px solid var(--lo-border-strong);
+        }
+        .preset-btn:hover { background-color: var(--lo-subtle); }
+        .preset-btn.active { background-color: var(--lo-blue); border-color: var(--lo-blue); color: white; }
+
+        .hint { font-size: 0.8rem; color: var(--lo-muted); margin-top: 0.5rem; }
+        .seat-count { font-size: 0.85rem; color: var(--lo-muted); font-family: var(--font-mono); }
+        .seat-count strong { color: var(--lo-ink-strong); }
+
+        .toggle-row { display: flex; align-items: center; gap: 0.5rem; }
+        .toggle-row input { width: 1.1rem; height: 1.1rem; accent-color: var(--lo-blue); }
+        .toggle-row label { margin: 0; font-size: 0.9rem; color: var(--lo-ink); }
+
+        /* Reglar */
+        .rule-form { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+        .rule-form select { flex: 1; min-width: 12rem; max-width: 18rem; }
+        .rule-form button { padding: 0.5rem 1rem; font-size: 0.9rem; }
+        #rule-picker {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.25rem 0.75rem;
+            margin: 0.5rem 0 0.75rem;
+            max-height: 190px;
+            overflow-y: auto;
+            padding: 0.6rem;
+            background: #fff;
+            border: 1px solid var(--lo-border-strong);
+            border-radius: 4px;
+        }
+        .button-row { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+
+        /* Elevliste */
+        #roster {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 0.4rem 0.6rem;
+            max-height: 260px;
+            overflow-y: auto;
+            padding: 0.6rem;
+            background: #fff;
+            border: 1px solid var(--lo-border-strong);
+            border-radius: 4px;
+        }
+        .roster-item { display: flex; align-items: center; gap: 0.3rem; }
+        .roster-item input {
+            flex: 1;
+            min-width: 0;
+            padding: 0.3rem 0.4rem;
+            font-size: 0.87rem;
+            border: 1px solid transparent;
+            background: transparent;
+            border-radius: 3px;
+        }
+        .roster-item input:hover { border-color: var(--lo-border); }
+        .roster-item input:focus { border-color: var(--lo-blue); background: #fff; }
+        .roster-del {
+            background: none; border: none; color: var(--lo-muted);
+            font-size: 0.9rem; line-height: 1; padding: 0.25rem; cursor: pointer; border-radius: 3px;
+        }
+        .roster-del:hover { background: rgba(197, 48, 48, 0.1); color: var(--lo-red); }
+        #roster-count { font-weight: 400; }
+
+        #add-student-input {
+            flex: 1;
+            min-width: 14rem;
+            min-height: 0;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            border-radius: 4px;
+            resize: vertical;
+        }
+
+        .storage-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--lo-border);
+        }
+        .storage-row input[type="text"] { flex: 1; min-width: 10rem; width: auto; }
+        .storage-row select { flex: 1; min-width: 10rem; }
+        .storage-row button { padding: 0.5rem 0.9rem; font-size: 0.87rem; }
+
+        .picker-item { display: flex; align-items: center; gap: 0.45rem; font-size: 0.88rem; }
+        .picker-item input { accent-color: var(--lo-blue); width: 1rem; height: 1rem; flex-shrink: 0; }
+        .picker-item label { margin: 0; font-weight: 400; cursor: pointer; }
+        .rule-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+        .rule-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.32rem 0.7rem;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            border: 1px solid;
+        }
+        .rule-chip.apart { background-color: rgba(197, 48, 48, 0.07); border-color: var(--lo-red); color: var(--lo-red); }
+        .rule-chip.saman { background-color: rgba(39, 103, 73, 0.08); border-color: var(--lo-green); color: var(--lo-green); }
+        .rule-chip button {
+            background: none; border: none; color: inherit;
+            font-size: 1rem; line-height: 1; padding: 0 0.1rem; cursor: pointer; font-weight: 700;
+        }
+
+        /* Handlingsknappar */
+        .action-row { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.25rem 0; align-items: stretch; }
+        #map-title-input { flex: 1; min-width: 12rem; width: auto; }
+        .action-row .btn-green { flex-grow: 1; }
+
+        /* Verktøylinje over kartet */
+        .map-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.6rem 0.9rem;
+            margin-bottom: 0.6rem;
+        }
+        .map-toolbar .tb-label { font-size: 0.85rem; font-weight: 600; color: var(--lo-muted); }
+        .map-toolbar .hint { margin: 0; flex: 1; min-width: 12rem; }
+        #undo-button { padding: 0.35rem 0.8rem; font-size: 0.85rem; }
+        #undo-button:disabled { opacity: .4; cursor: default; }
+        #undo-button:disabled:hover { background: transparent; }
+        .segmented { display: flex; border: 1px solid var(--lo-border-strong); border-radius: 4px; overflow: hidden; }
+        .seg-btn {
+            padding: 0.35rem 0.8rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: var(--lo-surface);
+            color: var(--lo-ink);
+            border: none;
+            border-radius: 0;
+            cursor: pointer;
+        }
+        .seg-btn:not(:last-child) { border-right: 1px solid var(--lo-border-strong); }
+        .seg-btn:hover { background: var(--lo-subtle); }
+        .seg-btn.active { background: var(--lo-blue); color: #fff; }
+
+        /* Kartet */
+        #map-outer {
+            background-color: var(--lo-subtle);
+            border: 1px solid var(--lo-border);
+            border-radius: 6px;
+            padding: 1rem;
+        }
+        #map-title-display { font-family: var(--font-display); font-size: 1.25rem; font-weight: 600; letter-spacing: -0.02em; color: var(--lo-ink-strong); margin-bottom: 0.15rem; }
+        #map-date-display { font-size: 0.78rem; color: var(--lo-muted); margin-bottom: 0.75rem; font-family: var(--font-mono); }
+        #map-room {
+            position: relative;
+            width: 100%;
+            border: 3px solid var(--lo-ink-strong);
+            border-radius: 4px;
+            background-color: var(--lo-surface);
+            overflow: hidden;
+        }
+        .desk {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background-color: #fff;
+            border: 1.5px solid var(--lo-border-strong);
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(2, 6, 23, 0.06);
+            overflow: hidden;
+            cursor: pointer;
+            user-select: none;
+            transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+            padding: 2px;
+            line-height: 1.15;
+            color: var(--lo-ink);
+        }
+        .desk .fn { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+        .desk .ln { color: var(--lo-muted); font-size: 0.82em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+        .desk.empty { background-color: transparent; border-style: dashed; box-shadow: none; cursor: pointer; }
+        .desk.disabled { opacity: 0.25; border-style: dotted; background: transparent; box-shadow: none; }
+        .desk.selected { border-color: var(--lo-blue); box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.35); }
+        .desk.viol { border-color: var(--lo-red); box-shadow: 0 0 0 2px rgba(197, 48, 48, 0.35); }
+        .desk.dragover { border-color: var(--lo-green); box-shadow: 0 0 0 3px rgba(39, 103, 73, 0.35); }
+        body.edit-mode .desk { cursor: crosshair; }
+
+        .room-fixture {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            border-radius: 3px;
+            font-size: 0.72rem;
+        }
+        .fixture-tavle { background-color: var(--lo-tavle); color: var(--lo-mint); border: 1px solid var(--lo-ink-strong); }
+        .fixture-dor { background-color: #EBDDC3; color: #7A5C2E; border: 1px solid #C9B282; letter-spacing: 0.08em; }
+
+        /* Elevar utan plass */
+        #tray-container { margin-top: 1rem; }
+        #tray-container h3 { font-family: var(--font-display); font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--lo-warn); }
+        #tray { display: flex; flex-wrap: wrap; gap: 0.5rem; min-height: 2.5rem; padding: 0.5rem; border: 1px dashed var(--lo-border-strong); border-radius: 5px; background: var(--lo-surface); }
+        .tray-chip {
+            padding: 0.4rem 0.75rem;
+            background-color: #fff;
+            border: 1.5px solid var(--lo-warn);
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--lo-ink);
+            cursor: pointer;
+            user-select: none;
+        }
+        .tray-chip.selected { border-color: var(--lo-blue); box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.35); }
+
+        /* Brotmeldingar */
+        #violations { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.4rem; }
+        .viol-msg {
+            padding: 0.5rem 0.75rem;
+            background-color: rgba(197, 48, 48, 0.07);
+            border: 1px solid var(--lo-red);
+            border-left-width: 4px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            color: var(--lo-red);
+        }
+
+        #error-message {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background-color: rgba(197, 48, 48, 0.07);
+            color: var(--lo-red);
+            border: 1px solid var(--lo-red);
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        footer { margin-top: 1rem; font-family: var(--font-mono); color: var(--lo-muted); font-size: 0.85rem; text-align: center; }
+        footer a { color: var(--lo-muted); text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; transition: color 0.2s; }
+        footer a:hover { color: var(--lo-blue); }
+        footer svg { width: 1.2rem; height: 1.2rem; fill: currentColor; }
+
+        /* Hjelp / kom i gang */
+        #help-button {
+            position: absolute;
+            top: 1.5rem;
+            right: 4.1rem;
+            width: 2.15rem;
+            height: 2.15rem;
+            padding: 0;
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 600;
+            background-color: transparent;
+            border: 1px solid var(--lo-border-strong);
+            color: var(--lo-muted);
+            border-radius: 50%;
+        }
+        #help-button:hover { background-color: var(--lo-blue); border-color: var(--lo-blue); color: #fff; }
+
+        #help-dialog {
+            margin: auto;
+            border: 1px solid var(--lo-border-strong);
+            border-radius: 6px;
+            background: var(--lo-surface);
+            color: var(--lo-ink);
+            padding: 0;
+            max-width: 34rem;
+            width: calc(100% - 2rem);
+            box-shadow: 0 12px 32px rgba(2, 6, 23, .22);
+            max-height: calc(100vh - 3rem);
+            overflow-y: auto;
+        }
+        #help-dialog::backdrop { background: rgba(21, 32, 43, .55); }
+        .help-inner { padding: 1.75rem; }
+        #help-dialog h2 {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--lo-ink-strong);
+        }
+        .help-lede { margin-top: .4rem; color: var(--lo-muted); font-size: .95rem; }
+        .help-steps {
+            list-style: none;
+            counter-reset: h;
+            margin: 1.25rem 0 0;
+            padding: 0;
+            display: grid;
+            gap: .85rem;
+        }
+        .help-steps li {
+            counter-increment: h;
+            display: grid;
+            grid-template-columns: 1.6rem 1fr;
+            gap: .75rem;
+            align-items: start;
+        }
+        .help-steps li::before {
+            content: counter(h);
+            font-family: var(--font-mono);
+            font-size: .78rem;
+            color: var(--lo-blue);
+            border: 1px solid var(--lo-border-strong);
+            border-radius: 3px;
+            text-align: center;
+            padding: .12rem 0;
+            line-height: 1.3;
+        }
+        .help-steps b {
+            grid-column: 2;
+            display: block;
+            font-weight: 600;
+            font-size: .96rem;
+            color: var(--lo-ink-strong);
+            line-height: 1.35;
+        }
+        .help-steps span {
+            grid-column: 2;
+            display: block;
+            margin-top: .12rem;
+            font-size: .88rem;
+            color: var(--lo-muted);
+            line-height: 1.45;
+        }
+        .help-foot {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .75rem 1rem;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+            padding-top: 1.1rem;
+            border-top: 1px solid var(--lo-border);
+        }
+        .help-foot a { color: var(--lo-blue); font-size: .9rem; font-weight: 600; text-decoration: none; }
+        .help-foot a:hover { text-decoration: underline; }
+        .help-foot button { padding: .6rem 1.3rem; }
+
+        #print-unplaced { display: none; }
+
+        .hidden { display: none !important; }
+
+        /* ---------- UTSKRIFT ---------- */
+        @page { size: landscape; margin: 1.2cm; }
+        @media print {
+            body { background: white; color: black; padding: 0; display: block; }
+            body > *:not(.main-container), .main-container > *:not(main), main > *:not(#step2-container),
+            #step2-container > *:not(#print-area) { display: none !important; }
+            .main-container { background: white; border: none; box-shadow: none; padding: 0; max-width: 100%; margin: 0; }
+            #map-outer { background: white; border: none; padding: 0; }
+            #map-title-display { color: black; font-size: 15pt; margin-bottom: 0; }
+            #map-date-display { color: #444; font-size: 8pt; margin-bottom: 0.25rem; }
+            #map-room { border-color: #333; background: white; background-image: none; margin: 0 auto; }
+            .desk { background: white; border-color: #444; color: black; box-shadow: none !important; }
+            .desk .ln { color: #444; }
+            .desk.empty { background: white; border-style: dashed; border-color: #b0b0b0; }
+            .desk.disabled { display: none; }
+            .desk.viol { border-color: #444; }
+            /* Tving fargane, elles forsvinn kvit tavletekst når «bakgrunnsgrafikk» er av */
+            .fixture-tavle, .fixture-dor { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .fixture-tavle { background: #15202B; color: #fff; border-color: #15202B; }
+            .fixture-dor { background: #e0cfae; color: #4a3720; border-color: #8a7040; }
+            #tray-container, #violations, #help-dialog, #help-button { display: none !important; }
+            #print-unplaced:not(:empty) {
+                display: block;
+                margin-top: .5rem;
+                font-size: 9pt;
+                color: #000;
+                border-top: 1px solid #999;
+                padding-top: .3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+
+    <dialog id="help-dialog" aria-labelledby="help-title">
+        <div class="help-inner">
+            <h2 id="help-title">Slik kjem du i gang</h2>
+            <p class="help-lede">Rekkjefølgja under sparar deg for omtrekking, fordi kvart steg byggjer på det førre.</p>
+            <ol class="help-steps">
+                <li><b>Lim inn klassa</b><span>Eitt namn per linje — eller hent ein klasse du har lagra før.</span></li>
+                <li><b>Sett opp rommet fyrst</b><span>Oppsett, tavle, dører, og kryss ut bord som ikkje finst. Dette avgjer kven som blir naboar.</span></li>
+                <li><b>Så sitjereglane</b><span>Éin regel per gruppe — kryss av alle det gjeld, ikkje eitt par om gongen.</span></li>
+                <li><b>Trekk kartet</b><span>Trykk fleire gonger til du får eit du likar.</span></li>
+                <li><b>Finjuster til slutt</b><span>Dra elevar eller klikk på to bord for å byte. Ei ny trekking overskriv justeringane.</span></li>
+                <li><b>Lagre klassa</b><span>Gjev du klassen namn, blir elevar, reglar, rom og plassering hugsa til neste gong.</span></li>
+                <li><b>Skriv ut eller last ned PNG</b></li>
+            </ol>
+            <div class="help-foot">
+                <a id="help-guide-link" href="#" target="_blank" rel="noopener noreferrer">Sjå heile rettleiinga med skjermbilete →</a>
+                <button id="help-close" class="btn-primary" autofocus>Kom i gang</button>
+            </div>
+        </div>
+    </dialog>
+
+    <div class="main-container">
+        <button id="help-button" class="no-print" aria-label="Slik kjem du i gang" title="Slik kjem du i gang">?</button>
+        <button id="restart-button" class="no-print" aria-label="Start på nytt" title="Start på nytt">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
+        </button>
+        <header>
+            <h1><span class="mark">Klassekart</span>-generator 🪑</h1>
+            <p>Lag klassekart frå namneliste eller <strong>Visma InSchool</strong> — med romoppsett og sitjereglar.</p>
+        </header>
+
+        <main>
+            <!-- STEG 1: Elevliste -->
+            <div id="step1-container">
+                <div class="input-tabs">
+                    <button class="input-tab active" data-mode="namneliste">Frå namneliste</button>
+                    <button class="input-tab" data-mode="visma">Frå Visma InSchool</button>
+                </div>
+
+                <div id="guide-container" class="guide-box hidden">
+                    <h2>Slik gjer du:</h2>
+                    <ol>
+                        <li>Skriv ut elevliste frå Visma InSchool (elevliste med bilete, inkluder namneliste).</li>
+                        <li>Kopier <strong>heile</strong> tabellen med namnelista (nummer, klasse, elevnamn, faglærarnamn).</li>
+                        <li>Lim inn lista i tekstfeltet under og trykk «Vidare».</li>
+                    </ol>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label for="student-list" id="student-list-label">Namneliste</label>
+                    <textarea id="student-list" rows="10" placeholder="Skriv inn eitt namn per linje...&#10;&#10;Døme:&#10;Nora Bakke&#10;Aisha Warsame&#10;Jakub Kowalski"></textarea>
+                </div>
+                <div class="button-row">
+                    <button id="init-button" class="btn-primary" style="flex: 1;">Vidare →</button>
+                    <button id="empty-class-button" class="btn-secondary">Start med tom klasse</button>
+                </div>
+                <div id="saved-on-start" class="hidden" style="margin-top: 1rem;">
+                    <label for="start-saved-select">…eller hent ein lagra klasse</label>
+                    <div class="button-row">
+                        <select id="start-saved-select" style="flex: 1; max-width: none;"></select>
+                        <button id="start-load-button" class="btn-secondary">📂 Hent</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEG 2: Kart -->
+            <div id="step2-container" class="hidden">
+
+                <details class="panel" id="panel-rom">
+                    <summary>
+                        <span class="panel-title">Rom</span>
+                        <span class="panel-sum" id="sum-rom"></span>
+                    </summary>
+                    <div class="panel-body">
+                    <div class="controls-row" style="margin-bottom: 1rem;">
+                        <div class="preset-buttons">
+                            <button class="preset-btn" data-preset="rader">Rader</button>
+                            <button class="preset-btn active" data-preset="par">Tobord</button>
+                            <button class="preset-btn" data-preset="firar">Firarbord</button>
+                            <button class="preset-btn" data-preset="hestesko">Hestesko</button>
+                            <button class="preset-btn" data-preset="custom">Eige rom</button>
+                        </div>
+                    </div>
+                    <div id="custom-room-box" class="hidden" style="margin-bottom: 1rem;">
+                        <label for="custom-rows-input">Rader i rommet — éi linje per rad</label>
+                        <textarea id="custom-rows-input" rows="5" style="min-height: 0; font-family: var(--font-mono);" placeholder="2+6&#10;3+6&#10;3+7&#10;2+7"></textarea>
+                        <p class="hint">Kvart tal er bord som står inntil kvarandre (naboar), <strong>+</strong> er gang mellom dei. Tom linje gjev luft mellom radene. Døme: <code>2+6</code> = to bord, gang, seks bord.</p>
+                    </div>
+                    <div class="controls-row">
+                        <div class="control-item dim-item">
+                            <label for="rows-input" id="rows-label">Rader</label>
+                            <input type="number" id="rows-input" min="1" max="12" value="5">
+                        </div>
+                        <div class="control-item dim-item">
+                            <label for="cols-input" id="cols-label">Par per rad</label>
+                            <input type="number" id="cols-input" min="1" max="12" value="3">
+                        </div>
+                        <div class="control-item">
+                            <label for="tavle-select">Tavle</label>
+                            <select id="tavle-select">
+                                <option value="top" selected>Framme (topp)</option>
+                                <option value="bottom">Bak (botn)</option>
+                                <option value="left">Venstre</option>
+                                <option value="right">Høgre</option>
+                            </select>
+                        </div>
+                        <div class="control-item">
+                            <label for="dor-wall-select">Dør 1 – vegg</label>
+                            <select id="dor-wall-select">
+                                <option value="none">Ingen</option>
+                                <option value="top" selected>Framme</option>
+                                <option value="bottom">Bak</option>
+                                <option value="left">Venstre</option>
+                                <option value="right">Høgre</option>
+                            </select>
+                        </div>
+                        <div class="control-item">
+                            <label for="dor-pos-select">Dør 1 – plassering</label>
+                            <select id="dor-pos-select">
+                                <option value="start">Til venstre / øvst</option>
+                                <option value="mid">Midt på</option>
+                                <option value="end" selected>Til høgre / nedst</option>
+                            </select>
+                        </div>
+                        <div class="control-item">
+                            <label for="dor2-wall-select">Dør 2 – vegg</label>
+                            <select id="dor2-wall-select">
+                                <option value="none" selected>Ingen</option>
+                                <option value="top">Framme</option>
+                                <option value="bottom">Bak</option>
+                                <option value="left">Venstre</option>
+                                <option value="right">Høgre</option>
+                            </select>
+                        </div>
+                        <div class="control-item">
+                            <label for="dor2-pos-select">Dør 2 – plassering</label>
+                            <select id="dor2-pos-select">
+                                <option value="start" selected>Til venstre / øvst</option>
+                                <option value="mid">Midt på</option>
+                                <option value="end">Til høgre / nedst</option>
+                            </select>
+                        </div>
+                        <div class="control-item">
+                            <label for="max-per-bord">Maks per bord</label>
+                            <select id="max-per-bord">
+                                <option value="0" selected>Auto</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                            </select>
+                        </div>
+                        <div class="control-item toggle-row">
+                            <input type="checkbox" id="ingen-aleine">
+                            <label for="ingen-aleine">Unngå at nokon sit åleine</label>
+                        </div>
+                        <div class="control-item toggle-row">
+                            <input type="checkbox" id="show-lastname-toggle">
+                            <label for="show-lastname-toggle">Vis etternamn</label>
+                        </div>
+                    </div>
+                    </div>
+                </details>
+
+                <details class="panel" id="panel-klasse">
+                    <summary>
+                        <span class="panel-title">Klasse</span>
+                        <span class="panel-sum" id="sum-klasse"></span>
+                    </summary>
+                    <div class="panel-body">
+                    <div id="roster"></div>
+                    <div class="rule-form" style="margin-top: 0.75rem;">
+                        <textarea id="add-student-input" rows="1" placeholder="Nytt namn, t.d. Nora Bakke — eller lim inn fleire namn, eitt per linje"></textarea>
+                        <button id="add-student-button" class="btn-secondary">+ Legg til elev</button>
+                    </div>
+                    <p class="hint">Rediger eit namn ved å skrive i feltet. Trykk Enter for å leggje til. Nye elevar hamnar i «utan plass» til du plasserer dei eller trekkjer kartet på nytt.</p>
+
+                    <div class="storage-row">
+                        <input type="text" id="class-name-input" placeholder="Namn på klassen, t.d. 1STA">
+                        <button id="save-class-button" class="btn-secondary" title="Tek med elevane, sitjereglane, romoppsettet, utkryssa bord, tittelen og sjølve plasseringa. Lagrar i denne nettlesaren.">💾 Lagre klasse</button>
+                        <select id="saved-classes"></select>
+                        <button id="load-class-button" class="btn-secondary">📂 Hent</button>
+                        <button id="delete-class-button" class="btn-secondary">🗑️ Slett</button>
+                        <button id="export-class-button" class="btn-secondary" title="Tek med elevane, sitjereglane, romoppsettet, utkryssa bord, tittelen og sjølve plasseringa. Lastar ned som JSON-fil.">⬇️ Eksporter fil</button>
+                        <button id="import-class-button" class="btn-secondary">⬆️ Importer fil</button>
+                        <input type="file" id="import-file" accept="application/json,.json" class="hidden">
+                    </div>
+                    <p class="hint" id="storage-status">Lagre og eksporter tek med <strong>elevane, sitjereglane, romoppsettet, utkryssa bord, tittelen og sjølve plasseringa</strong> — ikkje berre namnelista. Lagringa skjer i denne nettlesaren; skal klassen med til ei anna maskin, bruk eksporter og importer.</p>
+                    </div>
+                </details>
+
+                <details class="panel" id="panel-reglar">
+                    <summary>
+                        <span class="panel-title">Reglar</span>
+                        <span class="panel-sum" id="sum-reglar"></span>
+                    </summary>
+                    <div class="panel-body">
+                    <label style="font-size: 0.85rem; color: var(--lo-muted);">Kryss av elevane regelen gjeld (to eller fleire):</label>
+                    <div id="rule-picker"></div>
+                    <div class="rule-form">
+                        <select id="rule-type">
+                            <option value="apart">ingen av desse skal sitte saman</option>
+                            <option value="saman">desse skal sitte saman</option>
+                        </select>
+                        <button id="add-rule-button" class="btn-secondary">+ Legg til regel</button>
+                    </div>
+                    <div class="rule-chips" id="rule-chips"></div>
+                    <p class="hint">Reglane gjeld naboplassar: sidemann, same tobord/firarbord, eller naboen i hesteskoen. «Ikkje saman» tyder at ingen i utvalet blir naboar; «saman» at dei blir plasserte samla.</p>
+                    </div>
+                </details>
+
+                <div class="action-row">
+                    <button id="generate-button" class="btn-green">🎲 Trekk klassekart</button>
+                    <input type="text" id="map-title-input" aria-label="Tittel på kartet" placeholder="Tittel, t.d. Klassekart 1STA">
+                    <button id="print-button" class="btn-secondary">🖨️ Skriv ut</button>
+                    <button id="png-button" class="btn-secondary">🖼️ Last ned PNG</button>
+                </div>
+
+                <div class="map-toolbar">
+                    <span class="tb-label">Rediger bord</span>
+                    <div class="segmented" id="edit-scope-seg">
+                        <button type="button" class="seg-btn active" data-edit="off">Av</button>
+                        <button type="button" class="seg-btn" data-edit="seat">Enkeltplass</button>
+                        <button type="button" class="seg-btn" data-edit="unit">Heile bordet</button>
+                    </div>
+                    <button type="button" id="undo-button" class="btn-secondary" disabled>↩ Angre</button>
+                    <span class="hint" id="edit-hint"></span>
+                </div>
+
+                <div id="print-area">
+                    <div id="map-outer">
+                        <div id="map-title-display">Klassekart</div>
+                        <div id="map-date-display"></div>
+                        <div id="map-room"></div>
+                        <div id="tray-container" class="hidden">
+                            <h3>⚠️ Elevar utan plass — klikk på eleven, så på bordet han skal sitte ved</h3>
+                            <div id="tray"></div>
+                        </div>
+                        <div id="violations"></div>
+                        <div id="print-unplaced" aria-hidden="true"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="error-message" class="hidden"></div>
+        </main>
+    </div>
+
+    <footer>
+        <a href="https://github.com/lektorodd/gruppegenerator" target="_blank" rel="noopener noreferrer">
+            <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>GitHub</title><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+            lektorodd
+        </a>
+    </footer>
+
+    <script>
+        // ---------- Tilstand ----------
+        let students = [];            // {id, firstName, lastName, formattedName}
+        let inputMode = 'namneliste';
+        let preset = 'par';
+        let disabledSeats = new Set();
+        let rules = [];               // {type: 'apart'|'saman', members: [elev-id-ar]}
+        let assignment = {};          // seatId -> studentId
+        let selected = null;          // {kind: 'seat'|'tray', id}
+        let layout = null;
+        let editMode = 'off';         // 'off' | 'seat' | 'unit'
+        let printFit = null;          // {w, h} medan kartet blir teikna for utskrift
+        let undoStack = [];           // {assignment, disabled} — plassering og utkryssa bord
+        let manualEdits = false;      // sett når læraren har flytta nokon sjølv
+
+        let nextStudentId = 0;
+
+        const presetDims = {
+            rader:    { rows: 5, cols: 6 },
+            par:      { rows: 5, cols: 3 },
+            firar:    { rows: 2, cols: 4 },
+            hestesko: { rows: 5, cols: 6 },
+        };
+        const presetLabels = {
+            rader:    ['Rader', 'Bord per rad'],
+            par:      ['Rader', 'Par per rad'],
+            firar:    ['Grupperader', 'Grupper per rad'],
+            hestesko: ['Bord per side', 'Bord bak'],
+        };
+        const STORE_KEY = 'klassekart.klasser';
+        const SEEN_KEY = 'klassekart.sett-guide';
+        const GUIDE_URL = 'https://claude.ai/code/artifact/315f6ae3-15ea-442f-9696-8eb2f2b3428d';
+
+        // ---------- Element ----------
+        const $ = id => document.getElementById(id);
+        const studentListInput = $('student-list');
+        const studentListLabel = $('student-list-label');
+        const guideContainer = $('guide-container');
+        const step1Container = $('step1-container');
+        const step2Container = $('step2-container');
+        const errorMessage = $('error-message');
+        const rowsInput = $('rows-input');
+        const colsInput = $('cols-input');
+        const rowsLabel = $('rows-label');
+        const colsLabel = $('cols-label');
+        const tavleSelect = $('tavle-select');
+        const dorWallSelect = $('dor-wall-select');
+        const dorPosSelect = $('dor-pos-select');
+        const dor2WallSelect = $('dor2-wall-select');
+        const dor2PosSelect = $('dor2-pos-select');
+        const editSeg = $('edit-scope-seg');
+        const editHint = $('edit-hint');
+        const showLastToggle = $('show-lastname-toggle');
+        const maxPerBordSelect = $('max-per-bord');
+        const ingenAleineToggle = $('ingen-aleine');
+        const rulePicker = $('rule-picker');
+        const ruleType = $('rule-type');
+        const ruleChips = $('rule-chips');
+        const mapRoom = $('map-room');
+        const trayContainer = $('tray-container');
+        const trayEl = $('tray');
+        const violationsEl = $('violations');
+        const titleInput = $('map-title-input');
+        const titleDisplay = $('map-title-display');
+        const dateDisplay = $('map-date-display');
+        const customBox = $('custom-room-box');
+        const customInput = $('custom-rows-input');
+        const rosterEl = $('roster');
+        const addStudentInput = $('add-student-input');
+        const classNameInput = $('class-name-input');
+        const savedSelect = $('saved-classes');
+        const startSavedSelect = $('start-saved-select');
+        const storageStatus = $('storage-status');
+
+        // ---------- Hendingar ----------
+        document.querySelectorAll('.input-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.input-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                inputMode = tab.dataset.mode;
+                updateInputUI();
+            });
+        });
+        $('restart-button').addEventListener('click', clearAll);
+        $('init-button').addEventListener('click', initMap);
+        $('generate-button').addEventListener('click', () => {
+            if (manualEdits && !confirm('Du har flytta elevar sjølv. Ei ny trekking overskriv desse justeringane — hald fram?')) return;
+            snapshot();
+            generateAssignment();
+            manualEdits = false;
+            renderAll();
+        });
+        $('print-button').addEventListener('click', () => window.print());
+        $('png-button').addEventListener('click', exportPNG);
+        $('add-rule-button').addEventListener('click', addRule);
+        $('empty-class-button').addEventListener('click', () => startWith([]));
+        $('add-student-button').addEventListener('click', addFromInput);
+        addStudentInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); addFromInput(); }
+        });
+        classNameInput.addEventListener('input', updateSummaries);
+        $('save-class-button').addEventListener('click', saveClass);
+        $('export-class-button').addEventListener('click', exportClass);
+        $('import-class-button').addEventListener('click', () => $('import-file').click());
+        $('import-file').addEventListener('change', e => {
+            const file = e.target.files[0];
+            if (file) importClass(file);
+            e.target.value = '';
+        });
+        $('load-class-button').addEventListener('click', () => { if (savedSelect.value) loadClass(savedSelect.value); });
+        $('start-load-button').addEventListener('click', () => { if (startSavedSelect.value) loadClass(startSavedSelect.value); });
+        $('delete-class-button').addEventListener('click', () => {
+            const name = savedSelect.value;
+            if (name && confirm(`Slette den lagra klassen «${name}»?`)) deleteClass(name);
+        });
+
+        function addFromInput() {
+            const n = addStudents(addStudentInput.value);
+            if (n > 0) addStudentInput.value = '';
+        }
+
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                if (preset !== 'custom') presetDims[preset] = { rows: +rowsInput.value, cols: +colsInput.value };
+                preset = btn.dataset.preset;
+                updatePresetUI();
+                disabledSeats.clear();
+                clearUndo();
+                manualEdits = false;
+                generateAssignment();
+                renderAll();
+            });
+        });
+
+        function updatePresetUI() {
+            const custom = preset === 'custom';
+            customBox.classList.toggle('hidden', !custom);
+            document.querySelectorAll('.dim-item').forEach(el => el.style.display = custom ? 'none' : '');
+            if (!custom) {
+                rowsInput.value = presetDims[preset].rows;
+                colsInput.value = presetDims[preset].cols;
+                rowsLabel.textContent = presetLabels[preset][0];
+                colsLabel.textContent = presetLabels[preset][1];
+            } else if (!customInput.value.trim()) {
+                // Startpunkt: rader med to blokker à tre bord, tilpassa klassestorleiken
+                const rows = Math.max(1, Math.ceil(Math.max(students.length, 1) / 6));
+                customInput.value = Array.from({ length: rows }, () => '3+3').join('\n');
+            }
+        }
+
+        customInput.addEventListener('input', () => {
+            disabledSeats.clear();
+            clearUndo();
+            manualEdits = false;
+            generateAssignment();
+            renderAll();
+        });
+        [rowsInput, colsInput].forEach(inp => inp.addEventListener('change', () => {
+            inp.value = Math.max(1, Math.min(12, +inp.value || 1));
+            clearUndo();
+            manualEdits = false;
+            generateAssignment();
+            renderAll();
+        }));
+        [tavleSelect, dorWallSelect, dorPosSelect, dor2WallSelect, dor2PosSelect].forEach(sel => sel.addEventListener('change', renderAll));
+        [maxPerBordSelect, ingenAleineToggle].forEach(el => el.addEventListener('change', () => {
+            clearUndo();
+            manualEdits = false;
+            generateAssignment();
+            renderAll();
+        }));
+        showLastToggle.addEventListener('change', renderAll);
+        editSeg.querySelectorAll('.seg-btn').forEach(btn => {
+            btn.addEventListener('click', () => setEditMode(btn.dataset.edit));
+        });
+
+        function setEditMode(mode) {
+            editMode = mode;
+            editSeg.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.edit === mode));
+            document.body.classList.toggle('edit-mode', mode !== 'off');
+            editHint.textContent = mode === 'off'
+                ? '💡 Dra ein elev til eit anna bord, eller klikk på to bord for å byte plass.'
+                : (mode === 'unit'
+                    ? '✏️ Klikk i kartet for å krysse ut heile bordet — t.d. der eit bord fysisk manglar.'
+                    : '✏️ Klikk på ein plass for å krysse han ut, eller inn att.');
+            selected = null;
+            renderAll();
+        }
+        titleInput.addEventListener('input', updateTitle);
+        window.addEventListener('resize', () => { if (!step2Container.classList.contains('hidden') && !printFit) renderMap(); });
+
+        // Skaler kartet til papiret medan det blir skrive ut (liggande, konservativt for A4 og Letter)
+        window.addEventListener('beforeprint', () => {
+            if (step2Container.classList.contains('hidden')) return;
+            // Minste av A4 og Letter liggjande, med 1,2 cm marg på kvar side.
+            // 0,97 gjev litt pust, så kartet ikkje klistrar seg til kanten.
+            const CM = 37.8;
+            printFit = { w: 25.5 * CM * 0.97, h: (18.6 * CM - 52) * 0.97 };
+            renderMap();
+        });
+        window.addEventListener('afterprint', () => {
+            if (!printFit) return;
+            printFit = null;
+            renderMap();
+        });
+
+        // ---------- Steg 1: parsing (frå gruppegenerator) ----------
+        function updateInputUI() {
+            if (inputMode === 'visma') {
+                guideContainer.classList.remove('hidden');
+                studentListLabel.textContent = 'Elevliste';
+                studentListInput.placeholder = 'Lim inn heile klasselista frå Visma InSchool her...\n\nDøme:\n01 1STA Nora Bakke Peder Ås\n02 1STA Aisha Warsame Peder Ås';
+            } else {
+                guideContainer.classList.add('hidden');
+                studentListLabel.textContent = 'Namneliste';
+                studentListInput.placeholder = 'Skriv inn eitt namn per linje...\n\nDøme:\nNora Bakke\nAisha Warsame\nJakub Kowalski';
+            }
+        }
+
+        function parseNameList(lines) {
+            const names = lines.map((line, index) => {
+                const name = line.trim();
+                if (!name) return null;
+                const parts = name.split(/\s+/);
+                return { firstName: parts[0], lastName: parts.slice(1).join(' ') };
+            }).filter(Boolean);
+            return finishParsing(names);
+        }
+
+        function parseStudentList(lines) {
+            if (lines.length === 0) return [];
+            // Lærarnamnet er det felles suffikset på tvers av ALLE linjene
+            // (samanlikning av berre to linjer feilar når elevar deler etternamn).
+            const lineWords = lines.map(l => l.trim().split(/\s+/));
+            const minLen = Math.min(...lineWords.map(w => w.length));
+            let suffixLen = 0;
+            // La att minst nr + klasse + fornamn på kvar linje
+            outer: for (let i = 1; i <= minLen - 3; i++) {
+                const w = lineWords[0][lineWords[0].length - i];
+                for (const words of lineWords) {
+                    if (words[words.length - i] !== w) break outer;
+                }
+                suffixLen = i;
+            }
+            if (suffixLen === 0 && lines.length > 1) { throw new Error("Kunne ikkje identifisere eit felles lærarnamn. Sjekk formatet."); }
+            const parsed = lineWords.map(words => {
+                const parts = words.slice(0, words.length - suffixLen);
+                if (parts.length < 3) return null;
+                return { firstName: parts[2], lastName: parts.slice(3).join(' ') };
+            }).filter(Boolean);
+            return finishParsing(parsed);
+        }
+
+        function finishParsing(list) {
+            return list.map(s => ({ id: nextStudentId++, firstName: s.firstName, lastName: s.lastName }));
+        }
+
+        function splitName(text) {
+            const parts = text.trim().split(/\s+/);
+            return { firstName: parts[0] || '', lastName: parts.slice(1).join(' ') };
+        }
+
+        // Vis berre fornamn; legg til initialar når fleire deler fornamn.
+        // Må reknast på nytt kvar gong lista endrar seg.
+        function refreshNames() {
+            const counts = {};
+            students.forEach(s => { counts[s.firstName] = (counts[s.firstName] || 0) + 1; });
+            students.forEach(s => {
+                s.shortLast = '';
+                s.formattedName = s.firstName;
+                if (counts[s.firstName] > 1 && s.lastName) {
+                    s.shortLast = s.lastName.split(/\s+/).map(p => p.charAt(0).toUpperCase() + '.').join(' ');
+                    s.formattedName = `${s.firstName} ${s.shortLast}`;
+                }
+            });
+            // Heilt like namn får eit løpenummer, elles kan læraren ikkje sjå kven som er kven
+            const shown = {};
+            students.forEach(s => { shown[s.formattedName] = (shown[s.formattedName] || 0) + 1; });
+            const seen = {};
+            students.forEach(s => {
+                if (shown[s.formattedName] < 2) return;
+                const base = s.formattedName;
+                seen[base] = (seen[base] || 0) + 1;
+                s.shortLast = `${s.shortLast} ${seen[base]}`.trim();
+                s.formattedName = `${base} ${seen[base]}`;
+            });
+        }
+
+        // ---------- Elevlista ----------
+        function addStudents(text) {
+            const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+            if (lines.length === 0) return 0;
+            lines.forEach(line => {
+                const { firstName, lastName } = splitName(line);
+                students.push({ id: nextStudentId++, firstName, lastName });
+            });
+            afterRosterChange();
+            return lines.length;
+        }
+
+        function removeStudent(id) {
+            students = students.filter(s => s.id !== id);
+            Object.keys(assignment).forEach(sid => { if (assignment[sid] === id) delete assignment[sid]; });
+            rules.forEach(r => { r.members = r.members.filter(m => m !== id); });
+            rules = rules.filter(r => r.members.length >= 2);
+            afterRosterChange();
+        }
+
+        function renameStudent(id, text) {
+            const stu = students.find(s => s.id === id);
+            const { firstName, lastName } = splitName(text);
+            if (!stu || !firstName) { renderRoster(); return; }
+            stu.firstName = firstName;
+            stu.lastName = lastName;
+            afterRosterChange();
+        }
+
+        function afterRosterChange() {
+            clearUndo();
+            refreshNames();
+            growRoomToFit();
+            placeUnseated();
+            populateRulePicker();
+            renderRuleChips();
+            renderRoster();
+            renderAll();
+        }
+
+        // Utvid rommet så heile klassen får plass når det kjem nye elevar til.
+        // Eit eigedefinert rom blir aldri endra — der bestemmer læraren sjølv.
+        function growRoomToFit() {
+            if (preset === 'custom') return;
+            for (let guard = 0; guard < 24; guard++) {
+                layout = computeLayout();
+                if (activeSeats().length >= students.length) return;
+                const rows = +rowsInput.value, cols = +colsInput.value;
+                if (rows >= 12 && cols >= 12) return;
+                if (rows <= cols && rows < 12) rowsInput.value = rows + 1;
+                else if (cols < 12) colsInput.value = cols + 1;
+                else rowsInput.value = rows + 1;
+            }
+        }
+
+        // Gje elevar utan plass ein ledig plass som ikkje bryt «ikkje saman»-reglane,
+        // utan å flytte på dei som allereie sit.
+        function placeUnseated() {
+            layout = computeLayout();
+            const seated = new Set(Object.values(assignment));
+            const unseated = students.filter(s => !seated.has(s.id));
+            if (unseated.length === 0) return;
+            const forbid = expandForbid(rules);
+            const free = activeSeats().map(s => s.id).filter(id => assignment[id] === undefined);
+            unseated.forEach(stu => {
+                const idx = free.findIndex(sid => layout.neighbors[sid].every(n => {
+                    const other = assignment[n];
+                    return other === undefined || !forbid.has(pairKey(stu.id, other));
+                }));
+                if (idx >= 0) { assignment[free[idx]] = stu.id; free.splice(idx, 1); }
+            });
+        }
+
+        function renderRoster() {
+            rosterEl.innerHTML = '';
+            students.forEach(stu => {
+                const row = document.createElement('div');
+                row.className = 'roster-item';
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = `${stu.firstName}${stu.lastName ? ' ' + stu.lastName : ''}`;
+                input.addEventListener('change', () => renameStudent(stu.id, input.value));
+                input.addEventListener('keydown', e => { if (e.key === 'Enter') input.blur(); });
+                const del = document.createElement('button');
+                del.className = 'roster-del';
+                del.textContent = '✕';
+                del.title = `Fjern ${stu.formattedName}`;
+                del.addEventListener('click', () => removeStudent(stu.id));
+                row.append(input, del);
+                rosterEl.appendChild(row);
+            });
+        }
+
+        function initMap() {
+            errorMessage.classList.add('hidden');
+            const rawText = studentListInput.value.trim();
+            if (rawText === '') { showError("Lista kan ikkje vere tom."); return; }
+            const lines = rawText.split('\n').filter(l => l.trim() !== '');
+            let parsed;
+            try {
+                parsed = inputMode === 'visma' ? parseStudentList(lines) : parseNameList(lines);
+            } catch (e) { showError(e.message); return; }
+            if (parsed.length === 0) { showError("Fann ingen gyldige namn i lista. Sjekk formatet."); return; }
+            startWith(parsed);
+        }
+
+        function startWith(list) {
+            errorMessage.classList.add('hidden');
+            students = list;
+            refreshNames();
+
+            // Tilpass standardoppsetta til klassestorleiken, slik at heile klassen får plass
+            const n = Math.max(students.length, 1);
+            presetDims.par.rows = Math.max(1, Math.ceil(n / (2 * presetDims.par.cols)));
+            presetDims.rader.rows = Math.max(1, Math.ceil(n / presetDims.rader.cols));
+            const groups = Math.max(1, Math.ceil(n / 4));
+            presetDims.firar.cols = Math.min(3, groups);
+            presetDims.firar.rows = Math.ceil(groups / presetDims.firar.cols);
+            presetDims.hestesko.cols = Math.min(6, Math.max(1, Math.ceil(n / 4)));   // bord bak
+            presetDims.hestesko.rows = Math.max(1, Math.ceil((n - presetDims.hestesko.cols) / 2)); // per side
+            updatePresetUI();
+
+            step1Container.classList.add('hidden');
+            step2Container.classList.remove('hidden');
+            rules = [];
+            disabledSeats.clear();
+            assignment = {};
+            clearUndo();
+            manualEdits = false;
+            populateRulePicker();
+            renderRuleChips();
+            renderRoster();
+            updateTitle();
+            if (students.length > 0) generateAssignment();
+            ['panel-rom', 'panel-klasse', 'panel-reglar'].forEach(id => $(id).open = false);
+            renderAll();
+            if (students.length === 0) {
+                $('panel-klasse').open = true;
+                addStudentInput.focus();
+            }
+        }
+
+        function clearAll() {
+            students = []; rules = []; assignment = {}; selected = null;
+            disabledSeats.clear();
+            clearUndo();
+            manualEdits = false;
+            studentListInput.value = '';
+            titleInput.value = '';
+            classNameInput.value = '';
+            maxPerBordSelect.value = '0';
+            ingenAleineToggle.checked = false;
+            addStudentInput.value = '';
+            setEditMode('off');
+            renderRoster();
+            errorMessage.classList.add('hidden');
+            step2Container.classList.add('hidden');
+            step1Container.classList.remove('hidden');
+            inputMode = 'namneliste';
+            document.querySelectorAll('.input-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.input-tab[data-mode="namneliste"]').classList.add('active');
+            updateInputUI();
+            refreshSavedLists();
+            studentListInput.focus();
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+        }
+
+        // ---------- Lagring i nettlesaren ----------
+        function loadStore() {
+            try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }
+            catch (e) { return {}; }
+        }
+
+        function writeStore(obj) {
+            try { localStorage.setItem(STORE_KEY, JSON.stringify(obj)); return true; }
+            catch (e) { return false; }
+        }
+
+        function refreshSavedLists() {
+            const names = Object.keys(loadStore()).sort((a, b) => a.localeCompare(b, 'nn'));
+            [savedSelect, startSavedSelect].forEach(sel => {
+                sel.innerHTML = '';
+                if (names.length === 0) {
+                    const opt = document.createElement('option');
+                    opt.textContent = 'Ingen lagra klassar';
+                    opt.value = '';
+                    sel.appendChild(opt);
+                    return;
+                }
+                names.forEach(n => {
+                    const opt = document.createElement('option');
+                    opt.value = n; opt.textContent = n;
+                    sel.appendChild(opt);
+                });
+            });
+            $('saved-on-start').classList.toggle('hidden', names.length === 0);
+        }
+
+        // Same postformat blir brukt både til lagring i nettlesaren og til fil,
+        // slik at ein eksportert klasse kan hentast inn kvar som helst.
+        function buildRecord() {
+            const index = new Map(students.map((s, i) => [s.id, i]));
+            return {
+                students: students.map(s => ({ f: s.firstName, l: s.lastName })),
+                rules: rules.map(r => ({ type: r.type, members: r.members.map(m => index.get(m)) })),
+                seating: Object.entries(assignment).map(([sid, stu]) => [sid, index.get(stu)]),
+                room: {
+                    preset, rows: rowsInput.value, cols: colsInput.value, custom: customInput.value,
+                    tavle: tavleSelect.value,
+                    dor1: dorWallSelect.value, dor1pos: dorPosSelect.value,
+                    dor2: dor2WallSelect.value, dor2pos: dor2PosSelect.value,
+                    disabled: [...disabledSeats], showLast: showLastToggle.checked,
+                    maxPerBord: maxPerBordSelect.value, ingenAleine: ingenAleineToggle.checked
+                },
+                title: titleInput.value,
+                savedAt: new Date().toISOString()
+            };
+        }
+
+        function exportClass() {
+            errorMessage.classList.add('hidden');
+            if (students.length === 0) { showError("Klassen er tom."); return; }
+            const name = classNameInput.value.trim() || 'klassekart';
+            const record = buildRecord();
+            record.namn = name;
+            const blob = new Blob([JSON.stringify(record, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${slugify(name)}-${new Date().toISOString().slice(0, 10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            storageStatus.textContent = `⬇️ «${name}» eksportert som fil.`;
+        }
+
+        function importClass(file) {
+            errorMessage.classList.add('hidden');
+            const reader = new FileReader();
+            reader.onload = () => {
+                let record;
+                try { record = JSON.parse(reader.result); }
+                catch (e) { showError("Fila kunne ikkje lesast — er det ei klassekart-fil?"); return; }
+                if (!record || !Array.isArray(record.students) || record.students.length === 0) {
+                    showError("Fila inneheld ingen elevar — er det ei klassekart-fil?"); return;
+                }
+                const name = record.namn || file.name.replace(/\.json$/i, '');
+                applyRecord(name, record);
+                storageStatus.textContent = `⬆️ «${name}» henta frå fil. Trykk «Lagre klasse» for å ta vare på han her.`;
+            };
+            reader.onerror = () => showError("Klarte ikkje å lese fila.");
+            reader.readAsText(file);
+        }
+
+        function slugify(t) {
+            return t.toLowerCase().replace(/[^a-z0-9æøå]+/gi, '-').replace(/^-|-$/g, '') || 'klassekart';
+        }
+
+        function saveClass() {
+            errorMessage.classList.add('hidden');
+            const name = classNameInput.value.trim();
+            if (!name) { showError("Gje klassen eit namn før du lagrar."); return; }
+            if (students.length === 0) { showError("Klassen er tom."); return; }
+            // Reglar og plassering blir lagra med posisjon i lista, så id-ane kan byggast på nytt
+            const record = buildRecord();
+            const store = loadStore();
+            store[name] = record;
+            if (!writeStore(store)) { showError("Nettlesaren tillèt ikkje lagring her (privat vindauge eller full lagring)."); return; }
+            refreshSavedLists();
+            savedSelect.value = name;
+            storageStatus.textContent = `✅ «${name}» lagra ${new Date().toLocaleString('nn-NO')}.`;
+        }
+
+        function loadClass(name) {
+            errorMessage.classList.add('hidden');
+            const record = loadStore()[name];
+            if (!record) { showError("Fann ikkje den lagra klassen."); return; }
+            applyRecord(name, record);
+            storageStatus.textContent = `📂 «${name}» henta.`;
+        }
+
+        function applyRecord(name, record) {
+            // Den gamle plasseringa peikar på elevar som forsvinn no, og alt som
+            // blir teikna før den nye er bygd, ville slå opp på tomme id-ar
+            assignment = {};
+            selected = null;
+            students = record.students.map(s => ({ id: nextStudentId++, firstName: s.f, lastName: s.l }));
+            refreshNames();
+            const byIndex = i => students[i] ? students[i].id : undefined;
+            rules = (record.rules || [])
+                .map(r => ({ type: r.type, members: r.members.map(byIndex).filter(m => m !== undefined) }))
+                .filter(r => r.members.length >= 2);
+
+            const room = record.room || {};
+            preset = room.preset || 'par';
+            document.querySelectorAll('.preset-btn').forEach(b => b.classList.toggle('active', b.dataset.preset === preset));
+            // Legg dei lagra måla inn i presetDims, elles overskriv updatePresetUI dei
+            if (preset !== 'custom' && room.rows && room.cols) {
+                presetDims[preset] = { rows: +room.rows, cols: +room.cols };
+            }
+            customInput.value = room.custom || '';
+            tavleSelect.value = room.tavle || 'top';
+            dorWallSelect.value = room.dor1 || 'top';
+            dorPosSelect.value = room.dor1pos || 'end';
+            dor2WallSelect.value = room.dor2 || 'none';
+            dor2PosSelect.value = room.dor2pos || 'start';
+            showLastToggle.checked = !!room.showLast;
+            maxPerBordSelect.value = room.maxPerBord || '0';
+            ingenAleineToggle.checked = !!room.ingenAleine;
+            disabledSeats = new Set(room.disabled || []);
+            titleInput.value = record.title || '';
+            updatePresetUI();
+
+            step1Container.classList.add('hidden');
+            step2Container.classList.remove('hidden');
+            classNameInput.value = name;
+            clearUndo();
+            manualEdits = false;
+            populateRulePicker();
+            renderRuleChips();
+            renderRoster();
+            updateTitle();
+            setEditMode('off');
+
+            layout = computeLayout();
+            const seatExists = new Set(layout.seats.map(s => s.id));
+            assignment = {};
+            (record.seating || []).forEach(([sid, i]) => {
+                const id = byIndex(i);
+                if (id !== undefined && seatExists.has(sid) && !disabledSeats.has(sid)) assignment[sid] = id;
+            });
+            if (Object.keys(assignment).length === 0 && students.length > 0) generateAssignment();
+            renderAll();
+        }
+
+        function deleteClass(name) {
+            if (!name) return;
+            const store = loadStore();
+            delete store[name];
+            writeStore(store);
+            refreshSavedLists();
+            storageStatus.textContent = `🗑️ «${name}» sletta.`;
+        }
+
+        // Les romspesifikasjonen: «2+6» blir [2, 6], tom linje blir [] (luft mellom radene)
+        function parseCustomSpec() {
+            return customInput.value.split('\n').slice(0, 15).map(line =>
+                line.trim() === '' ? [] : line.split('+')
+                    .map(part => Math.min(12, parseInt(part.trim(), 10) || 0))
+                    .filter(nr => nr > 0)
+                    .slice(0, 8)
+            );
+        }
+
+        // ---------- Geometri ----------
+        // Alle mål i abstrakte einingar. Bord: 100 x 64.
+        function computeLayout() {
+            const rows = +rowsInput.value, cols = +colsInput.value;
+            const W = 100, H = 64;
+            const seats = [];
+            const neighbors = {};
+
+            function addSeat(id, x, y) { seats.push({ id, x, y, w: W, h: H }); neighbors[id] = []; }
+            function link(a, b) { neighbors[a].push(b); neighbors[b].push(a); }
+
+            if (preset === 'rader') {
+                const gx = 36, gy = 44;
+                for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++)
+                    addSeat(`r-${i}-${j}`, j * (W + gx), i * (H + gy));
+                for (let i = 0; i < rows; i++) for (let j = 1; j < cols; j++)
+                    link(`r-${i}-${j - 1}`, `r-${i}-${j}`);
+            } else if (preset === 'par') {
+                const aisle = 56, gy = 44;
+                for (let i = 0; i < rows; i++) for (let p = 0; p < cols; p++) {
+                    const x0 = p * (2 * W + aisle);
+                    addSeat(`p-${i}-${p}-0`, x0, i * (H + gy));
+                    addSeat(`p-${i}-${p}-1`, x0 + W, i * (H + gy));
+                    link(`p-${i}-${p}-0`, `p-${i}-${p}-1`);
+                }
+            } else if (preset === 'firar') {
+                const gx = 64, gy = 56;
+                for (let gi = 0; gi < rows; gi++) for (let gj = 0; gj < cols; gj++) {
+                    const x0 = gj * (2 * W + gx), y0 = gi * (2 * H + gy);
+                    const ids = [];
+                    for (let k = 0; k < 4; k++) {
+                        const id = `f-${gi}-${gj}-${k}`;
+                        addSeat(id, x0 + (k % 2) * W, y0 + Math.floor(k / 2) * H);
+                        ids.push(id);
+                    }
+                    for (let a = 0; a < 4; a++) for (let b = a + 1; b < 4; b++) link(ids[a], ids[b]);
+                }
+            } else if (preset === 'custom') {
+                // Éi linje per rad, t.d. «2+6»: blokker med bord som står inntil kvarandre,
+                // skilde av gang. Kolonnane er like breie i heile rommet, så gangane står
+                // på linje. Fyrste blokk ligg inntil venstre vegg og siste inntil høgre,
+                // slik pultar faktisk står — ledig plass hamnar då ved gangen i midten.
+                const spec = parseCustomSpec();
+                const gy = 44, aisle = 60;
+                const slotW = [];
+                spec.forEach(row => row.forEach((cnt, j) => { slotW[j] = Math.max(slotW[j] || 0, cnt); }));
+                const slotX = [];
+                let cursor = 0;
+                slotW.forEach((w, j) => { slotX[j] = cursor; cursor += w * W + aisle; });
+                spec.forEach((row, i) => {
+                    row.forEach((cnt, j) => {
+                        const slack = (slotW[j] - cnt) * W;
+                        const offset = j === 0 ? 0                       // inntil venstre vegg
+                            : j === row.length - 1 ? slack               // inntil høgre vegg
+                            : slack / 2;                                 // midt i sin kolonne
+
+                        const ids = [];
+                        for (let k = 0; k < cnt; k++) {
+                            const id = `c-${i}-${j}-${k}`;
+                            addSeat(id, slotX[j] + offset + k * W, i * (H + gy));
+                            ids.push(id);
+                        }
+                        for (let k = 1; k < ids.length; k++) link(ids[k - 1], ids[k]);
+                    });
+                });
+            } else if (preset === 'hestesko') {
+                const side = rows, back = cols;
+                const gy = 28, gxb = 24, aisle = 80;
+                const backStartX = W + aisle;
+                const rightX = backStartX + back * (W + gxb) - gxb + aisle;
+                const backY = side * (H + gy) + 10;
+                const path = [];
+                for (let i = 0; i < side; i++) { const id = `h-l-${i}`; addSeat(id, 0, i * (H + gy)); path.push(id); }
+                for (let j = 0; j < back; j++) { const id = `h-b-${j}`; addSeat(id, backStartX + j * (W + gxb), backY); path.push(id); }
+                for (let i = side - 1; i >= 0; i--) { const id = `h-r-${i}`; addSeat(id, rightX, i * (H + gy)); path.push(id); }
+                for (let i = 1; i < path.length; i++) link(path[i - 1], path[i]);
+            }
+
+            // Avgrensingsboks for borda
+            let maxX = 0, maxY = 0;
+            seats.forEach(s => { maxX = Math.max(maxX, s.x + s.w); maxY = Math.max(maxY, s.y + s.h); });
+
+            // Rom med luft rundt + ekstra plass til tavla
+            const pad = 24, tavleSpace = 54;
+            const tavleSide = tavleSelect.value;
+            const offX = pad + (tavleSide === 'left' ? tavleSpace : 0);
+            const offY = pad + (tavleSide === 'top' ? tavleSpace : 0);
+            const roomW = maxX + 2 * pad + ((tavleSide === 'left' || tavleSide === 'right') ? tavleSpace : 0);
+            const roomH = maxY + 2 * pad + ((tavleSide === 'top' || tavleSide === 'bottom') ? tavleSpace : 0);
+            seats.forEach(s => { s.x += offX; s.y += offY; });
+
+            // Tavle: brei stripe langs valt vegg
+            const tThick = 30, tInset = 16;
+            let tavle;
+            if (tavleSide === 'top' || tavleSide === 'bottom') {
+                const len = Math.max(200, roomW * 0.45);
+                tavle = { x: (roomW - len) / 2, y: tavleSide === 'top' ? tInset : roomH - tInset - tThick, w: len, h: tThick, vertical: false };
+            } else {
+                const len = Math.max(160, roomH * 0.45);
+                tavle = { x: tavleSide === 'left' ? tInset : roomW - tInset - tThick, y: (roomH - len) / 2, w: tThick, h: len, vertical: true };
+            }
+
+            // Dører: små klossar på valde vegger (inntil to)
+            const dLen = 74, dThick = 16;
+            const dors = [];
+            [[dorWallSelect, dorPosSelect], [dor2WallSelect, dor2PosSelect]].forEach(([wallSel, posSel]) => {
+                const dWall = wallSel.value, dPos = posSel.value;
+                if (dWall === 'none') return;
+                const frac = dPos === 'start' ? 0.12 : dPos === 'mid' ? 0.5 : 0.88;
+                if (dWall === 'top' || dWall === 'bottom') {
+                    dors.push({ x: roomW * frac - dLen / 2, y: dWall === 'top' ? 2 : roomH - dThick - 2, w: dLen, h: dThick, vertical: false });
+                } else {
+                    dors.push({ x: dWall === 'left' ? 2 : roomW - dThick - 2, y: roomH * frac - dLen / 2, w: dThick, h: dLen, vertical: true });
+                }
+            });
+
+            return { seats, neighbors, roomW, roomH, tavle, dors };
+        }
+
+        function activeSeats() {
+            return layout.seats.filter(s => !disabledSeats.has(s.id));
+        }
+
+        // ---------- Trekking med reglar ----------
+        function pairKey(a, b) { return a < b ? `${a}|${b}` : `${b}|${a}`; }
+        function shuffle(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function expandForbid(rs) {
+            const set = new Set();
+            rs.filter(r => r.type === 'apart').forEach(r => {
+                for (let i = 0; i < r.members.length; i++)
+                    for (let j = i + 1; j < r.members.length; j++)
+                        set.add(pairKey(r.members[i], r.members[j]));
+            });
+            return set;
+        }
+
+        function samanFind(rs) {
+            const parent = {};
+            const find = x => parent[x] === x ? x : (parent[x] = find(parent[x]));
+            students.forEach(s => parent[s.id] = s.id);
+            rs.filter(r => r.type === 'saman').forEach(r => {
+                for (let i = 1; i < r.members.length; i++) parent[find(r.members[i])] = find(r.members[0]);
+            });
+            return find;
+        }
+
+        function togetherClusters() {
+            const find = samanFind(rules);
+            const groups = {};
+            students.forEach(s => {
+                const root = find(s.id);
+                (groups[root] = groups[root] || []).push(s.id);
+            });
+            const clusters = [], singles = [];
+            Object.values(groups).forEach(g => (g.length > 1 ? clusters : singles).push(g));
+            return { clusters: clusters.sort((a, b) => b.length - a.length), singles: singles.map(g => g[0]) };
+        }
+
+        // Bordeining brukt til jamn fordeling: paret, firarbordet, rada eller sida av hesteskoen
+        function spreadUnitOf(seatId) {
+            const p = seatId.split('-');
+            if (preset === 'par' || preset === 'firar' || preset === 'custom') return p.slice(0, 3).join('-');
+            if (preset === 'rader') return `${p[0]}-${p[1]}`;      // rada
+            return `${p[0]}-${p[1]}`;                               // sida av hesteskoen
+        }
+
+        // Vel kva plassar som skal brukast, slik at elevane blir jamt fordelte over borda
+        // (elles kan eitt firarbord få fire elevar og eit anna berre to).
+        function maxPerBord() {
+            const v = +maxPerBordSelect.value;
+            return v > 0 ? v : Infinity;
+        }
+
+        function chooseSpreadSeats(seatIds, clusters) {
+            const tak = maxPerBord();
+            const aleineVern = ingenAleineToggle.checked;
+            // Utan tak og utan åleine-vern er det ingenting å fordele når
+            // klassen er minst like stor som talet på plassar
+            if (tak === Infinity && !aleineVern && students.length >= seatIds.length) return seatIds;
+            const units = new Map();
+            seatIds.forEach(id => {
+                const u = spreadUnitOf(id);
+                if (!units.has(u)) units.set(u, []);
+                units.get(u).push(id);
+            });
+            const unitList = shuffle([...units.values()]);
+            const quota = unitList.map(() => 0);
+            const romFor = i => Math.min(unitList[i].length, tak);
+            let left = students.length;
+            // «Saman»-grupper får eit heilt bord for seg, slik at dei faktisk får plass
+            const reservert = new Set();
+            clusters.forEach(c => {
+                if (c.length > left) return;
+                const i = unitList.findIndex((seats, k) => quota[k] === 0 && romFor(k) >= c.length);
+                if (i >= 0) { quota[i] = c.length; left -= c.length; reservert.add(i); }
+            });
+
+            // Åleine-vern verkar ved å avgrense kor mange bord som blir tekne i bruk.
+            // Å fordele på alle borda fyrst og så samle dei einslege etterpå gjev restar.
+            // Med maks 1 per bord er vernet uråd å oppfylle, og gjeld då ikkje.
+            let lovlege = null;
+            if (aleineVern && tak > 1 && students.length >= 2) {
+                const grense = Math.max(1, Math.floor(students.length / 2));
+                lovlege = new Set(reservert);
+                for (let i = 0; i < unitList.length && lovlege.size < grense; i++) lovlege.add(i);
+            }
+            const kanTa = i => (!lovlege || lovlege.has(i)) && quota[i] < romFor(i);
+
+            // Resten går alltid til bordet med færrast elevar, så dei skil seg med høgst éin
+            while (left > 0) {
+                let best = -1;
+                for (let i = 0; i < unitList.length; i++) {
+                    if (!kanTa(i)) continue;
+                    if (best === -1 || quota[i] < quota[best]) best = i;
+                }
+                if (best === -1) {
+                    // Dei valde borda rommar ikkje alle — ta i bruk resten heller enn
+                    // å la elevar stå utan plass
+                    if (lovlege) { lovlege = null; continue; }
+                    break;
+                }
+                quota[best]++; left--;
+            }
+
+            // Skulle nokon likevel bli ståande åleine, flytt han dit det alt sit nokon
+            if (aleineVern && tak > 1) {
+                for (let pass = 0; pass < unitList.length; pass++) {
+                    const aleine = quota.findIndex(q => q === 1);
+                    if (aleine === -1) break;
+                    const mål = quota.findIndex((q, i) => i !== aleine && q >= 1 && q < romFor(i));
+                    if (mål === -1) break;
+                    quota[aleine] = 0;
+                    quota[mål]++;
+                }
+            }
+            // Siste blokka i ei rad blir fylt frå høgre, så elevane sit inntil veggen
+            // og dei ledige pultane hamnar ved gangen i midten
+            const spec = preset === 'custom' ? parseCustomSpec() : null;
+            const fillsFromEnd = seatId => {
+                if (!spec) return false;
+                const [, r, b] = seatId.split('-').map(Number);
+                return spec[r] && spec[r].length > 1 && b === spec[r].length - 1;
+            };
+            const chosen = [];
+            unitList.forEach((seats, i) => {
+                const q = quota[i];
+                chosen.push(...(fillsFromEnd(seats[0]) ? seats.slice(seats.length - q) : seats.slice(0, q)));
+            });
+            return chosen;
+        }
+
+        function generateAssignment() {
+            errorMessage.classList.add('hidden');
+            layout = computeLayout();
+            assignment = {};
+            selected = null;
+            const allIds = activeSeats().map(s => s.id);
+            const { clusters, singles } = togetherClusters();
+
+            const spread = chooseSpreadSeats(allIds, clusters);
+            const tak = maxPerBord();
+
+            if (students.length > spread.length) {
+                const grunn = tak !== Infinity && spread.length < allIds.length
+                    ? `Maks ${tak} per bord gjev ${spread.length} plassar av ${allIds.length} moglege.`
+                    : `${students.length} elevar, men berre ${allIds.length} plassar.`;
+                showError(`For få plassar: ${grunn} Elevar utan plass hamnar i lista under kartet.`);
+            }
+
+            // Prøv fyrst med jamt fordelte bord. Held ikkje reglane der, prøv på nytt —
+            // med tak må andre forsøk halde seg innanfor taket, elles ville det bli brote.
+            const reserve = tak === Infinity ? allIds : chooseSpreadSeats(allIds, clusters);
+            const placed = tryAssign(spread, clusters, singles, 1500)
+                        || tryAssign(reserve, clusters, singles, 1500);
+            if (placed) { assignment = placed; return; }
+            showError("Fann ikkje ei plassering som oppfyller alle reglane. Prøv eit anna oppsett (t.d. firarbord for grupper på 3–4), færre reglar eller fleire bord.");
+        }
+
+        function tryAssign(seatIds, clusters, singles, attempts) {
+            const activeSet = new Set(seatIds);
+            const nb = {};
+            seatIds.forEach(id => { nb[id] = layout.neighbors[id].filter(n => activeSet.has(n)); });
+            const forbid = expandForbid(rules);
+
+            const canPlace = (sid, stuId, placed) => nb[sid].every(n => {
+                const o = placed[n];
+                return o === undefined || !forbid.has(pairKey(stuId, o));
+            });
+
+            const growConnected = (free, n) => {
+                for (let t = 0; t < 60; t++) {
+                    const freeArr = [...free];
+                    if (freeArr.length < n) return null;
+                    const set = [freeArr[Math.floor(Math.random() * freeArr.length)]];
+                    const inSet = new Set(set);
+                    while (set.length < n) {
+                        const frontier = [];
+                        set.forEach(sid => nb[sid].forEach(x => { if (free.has(x) && !inSet.has(x)) frontier.push(x); }));
+                        if (frontier.length === 0) break;
+                        const pick = frontier[Math.floor(Math.random() * frontier.length)];
+                        set.push(pick); inSet.add(pick);
+                    }
+                    if (set.length === n) return set;
+                }
+                return null;
+            };
+
+            for (let attempt = 0; attempt < attempts; attempt++) {
+                const free = new Set(seatIds);
+                const placed = {};
+                let ok = true;
+                const units = [...clusters.map(c => shuffle(c)), ...shuffle(singles).map(s => [s])];
+                for (const unit of units) {
+                    if (free.size < unit.length) { ok = free.size === 0; break; } // fulle rom: resten til lista
+                    if (unit.length === 1) {
+                        const cand = shuffle([...free]).find(sid => canPlace(sid, unit[0], placed));
+                        if (!cand) { ok = false; break; }
+                        placed[cand] = unit[0]; free.delete(cand);
+                    } else {
+                        let done = false;
+                        for (let t = 0; t < 40 && !done; t++) {
+                            const set = growConnected(free, unit.length);
+                            if (!set) break;
+                            const order = shuffle(unit);
+                            const trial = {};
+                            let fits = true;
+                            for (let k = 0; k < set.length; k++) {
+                                if (!canPlace(set[k], order[k], { ...placed, ...trial })) { fits = false; break; }
+                                trial[set[k]] = order[k];
+                            }
+                            if (fits) {
+                                Object.assign(placed, trial);
+                                set.forEach(sid => free.delete(sid));
+                                done = true;
+                            }
+                        }
+                        if (!done) { ok = false; break; }
+                    }
+                }
+                if (ok) return placed;
+            }
+            return null;
+        }
+
+        // ---------- Reglar ----------
+        function populateRulePicker() {
+            rulePicker.innerHTML = '';
+            students.forEach(s => {
+                const item = document.createElement('div');
+                item.className = 'picker-item';
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.id = `pick-${s.id}`;
+                cb.value = s.id;
+                const lab = document.createElement('label');
+                lab.htmlFor = cb.id;
+                lab.textContent = s.formattedName || s.firstName;
+                item.append(cb, lab);
+                rulePicker.appendChild(item);
+            });
+        }
+
+        function addRule() {
+            errorMessage.classList.add('hidden');
+            const members = [...rulePicker.querySelectorAll('input:checked')].map(cb => +cb.value);
+            const type = ruleType.value;
+            if (members.length < 2) { showError("Kryss av minst to elevar for regelen."); return; }
+            const key = members.slice().sort((a, b) => a - b).join(',');
+            if (rules.some(r => r.type === type && r.members.slice().sort((a, b) => a - b).join(',') === key)) {
+                showError("Denne regelen finst alt."); return;
+            }
+            // Motstrid: same par kan ikkje både vere forbode og i same saman-klynge
+            const testRules = [...rules, { type, members }];
+            const forbid = expandForbid(testRules);
+            const find = samanFind(testRules);
+            for (const pk of forbid) {
+                const [a, b] = pk.split('|').map(Number);
+                if (find(a) === find(b)) {
+                    const nA = students.find(s => s.id === a)?.formattedName || '?';
+                    const nB = students.find(s => s.id === b)?.formattedName || '?';
+                    showError(`Motstridande reglar: ${nA} og ${nB} ville fått både «saman»- og «ikkje saman»-regel.`);
+                    return;
+                }
+            }
+            rules.push({ type, members });
+            rulePicker.querySelectorAll('input:checked').forEach(cb => cb.checked = false);
+            renderRuleChips();
+            generateAssignment();
+            renderAll();
+        }
+
+        function renderRuleChips() {
+            ruleChips.innerHTML = '';
+            rules.forEach((r, idx) => {
+                const chip = document.createElement('span');
+                chip.className = `rule-chip ${r.type}`;
+                const names = r.members.map(id => students.find(s => s.id === id)?.formattedName || '?');
+                const symbol = r.type === 'apart' ? '🚫' : '🤝';
+                chip.append(`${symbol} ${names.join(r.type === 'apart' ? ' × ' : ' + ')}`);
+                const del = document.createElement('button');
+                del.textContent = '✕';
+                del.title = 'Fjern regelen';
+                del.addEventListener('click', () => {
+                    rules.splice(idx, 1);
+                    renderRuleChips();
+                    renderAll();
+                });
+                chip.appendChild(del);
+                ruleChips.appendChild(chip);
+            });
+        }
+
+        // ---------- Brot ----------
+        function findViolations() {
+            const seatOf = {};
+            Object.entries(assignment).forEach(([sid, stu]) => seatOf[stu] = sid);
+            const out = [];
+            const nameOf = id => students.find(s => s.id === id)?.formattedName || '?';
+            rules.forEach(r => {
+                if (r.type === 'apart') {
+                    for (let i = 0; i < r.members.length; i++) for (let j = i + 1; j < r.members.length; j++) {
+                        const sa = seatOf[r.members[i]], sb = seatOf[r.members[j]];
+                        if (sa && sb && layout.neighbors[sa].includes(sb)) {
+                            out.push({ msg: `🚫 ${nameOf(r.members[i])} og ${nameOf(r.members[j])} sit saman — dei skal ikkje det.`, seats: [sa, sb] });
+                        }
+                    }
+                } else {
+                    const names = r.members.map(nameOf).join(', ');
+                    const seated = r.members.filter(m => seatOf[m]);
+                    if (seated.length < r.members.length) {
+                        if (seated.length > 0) {
+                            out.push({ msg: `🤝 ${names} skal sitte saman, men nokon manglar plass.`, seats: seated.map(m => seatOf[m]) });
+                        }
+                        return;
+                    }
+                    // Er setene deira eit samanhengande nabolag?
+                    const seatSet = new Set(seated.map(m => seatOf[m]));
+                    const start = seatOf[seated[0]];
+                    const visited = new Set([start]);
+                    const queue = [start];
+                    while (queue.length) {
+                        const cur = queue.pop();
+                        layout.neighbors[cur].forEach(n => {
+                            if (seatSet.has(n) && !visited.has(n)) { visited.add(n); queue.push(n); }
+                        });
+                    }
+                    if (visited.size < seatSet.size) {
+                        out.push({ msg: `🤝 ${names} sit ikkje samla — dei skal sitte saman.`, seats: [...seatSet] });
+                    }
+                }
+            });
+            return out;
+        }
+
+        // ---------- Teikning ----------
+        function renderAll() {
+            renderMap();
+            renderTray();
+            renderViolations();
+            updateSummaries();
+        }
+
+        // Samandragslinjene skal fortelje tilstanden utan at seksjonen må opnast
+        function updateSummaries() {
+            const seats = activeSeats().length;
+            const presetNamn = { rader: 'Rader', par: 'Tobord', firar: 'Firarbord',
+                                 hestesko: 'Hestesko', custom: 'Eige rom' }[preset];
+            const mål = preset === 'custom'
+                ? `${parseCustomSpec().filter(r => r.length).length} rader`
+                : `${rowsInput.value} × ${colsInput.value}`;
+            const tak = maxPerBord();
+            let romTekst = `${presetNamn} · ${mål} · ${seats} plassar`;
+            if (tak !== Infinity) romTekst += ` · maks ${tak}`;
+            if (ingenAleineToggle.checked) romTekst += ' · ingen åleine';
+            $('sum-rom').textContent = romTekst;
+
+            const utan = students.length - Object.keys(assignment).length;
+            const lagra = classNameInput.value.trim();
+            let klasse = students.length === 0 ? 'Ingen elevar enno'
+                       : `${students.length} ${students.length === 1 ? 'elev' : 'elevar'}`;
+            if (lagra) klasse += ` · ${lagra}`;
+            $('sum-klasse').innerHTML = utan > 0
+                ? `${klasse} · <span class="warn">${utan} utan plass</span>`
+                : klasse;
+
+            const brot = findViolations().length;
+            let reglar = rules.length === 0 ? 'Ingen reglar'
+                       : `${rules.length} ${rules.length === 1 ? 'regel' : 'reglar'}`;
+            $('sum-reglar').innerHTML = brot > 0
+                ? `${reglar} · <span class="warn">${brot} brot</span>`
+                : reglar;
+        }
+
+        function updateTitle() {
+            titleDisplay.textContent = titleInput.value.trim() || 'Klassekart';
+            dateDisplay.textContent = new Date().toLocaleDateString('nn-NO', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+
+        function renderMap() {
+            layout = computeLayout();
+            let scale;
+            if (printFit) {
+                // Fyll utskriftssida: skaler etter både breidd og høgd
+                scale = Math.min(printFit.w / layout.roomW, printFit.h / layout.roomH);
+                mapRoom.style.width = `${layout.roomW * scale}px`;
+            } else {
+                mapRoom.style.width = '';
+                const availW = mapRoom.clientWidth || mapRoom.parentElement.clientWidth - 32;
+                scale = availW / layout.roomW;
+            }
+            mapRoom.style.height = `${layout.roomH * scale}px`;
+            mapRoom.innerHTML = '';
+
+            const viols = findViolations();
+            const violSeats = new Set(viols.flatMap(v => v.seats));
+            const editing = editMode !== 'off';
+
+            // Tavle og dør
+            const tavleDiv = document.createElement('div');
+            tavleDiv.className = 'room-fixture fixture-tavle';
+            positionEl(tavleDiv, layout.tavle, scale);
+            tavleDiv.textContent = 'TAVLE';
+            if (layout.tavle.vertical) { tavleDiv.style.writingMode = 'vertical-rl'; }
+            mapRoom.appendChild(tavleDiv);
+
+            layout.dors.forEach(dor => {
+                const dorDiv = document.createElement('div');
+                dorDiv.className = 'room-fixture fixture-dor';
+                positionEl(dorDiv, dor, scale);
+                dorDiv.textContent = 'DØR';
+                dorDiv.style.fontSize = `${Math.max(8, 11 * scale)}px`;
+                if (dor.vertical) { dorDiv.style.writingMode = 'vertical-rl'; }
+                mapRoom.appendChild(dorDiv);
+            });
+
+            // Bord
+            layout.seats.forEach(seat => {
+                const isDisabled = disabledSeats.has(seat.id);
+                if (isDisabled && !editing) return;
+                const div = document.createElement('div');
+                div.className = 'desk';
+                positionEl(div, seat, scale);
+                div.dataset.seatId = seat.id;
+                div.style.fontSize = `${Math.max(8, Math.min(15, seat.w * scale * 0.145))}px`;
+
+                const stuId = assignment[seat.id];
+                if (isDisabled) {
+                    div.classList.add('disabled');
+                } else if (stuId !== undefined) {
+                    const stu = students.find(s => s.id === stuId);
+                    const showLast = showLastToggle.checked;
+                    const fn = document.createElement('span');
+                    fn.className = 'fn';
+                    fn.textContent = showLast ? stu.firstName : stu.firstName + (stu.shortLast ? ` ${stu.shortLast}` : '');
+                    div.appendChild(fn);
+                    if (showLast && stu.lastName) {
+                        const ln = document.createElement('span');
+                        ln.className = 'ln';
+                        ln.textContent = stu.lastName;
+                        div.appendChild(ln);
+                    }
+                    div.draggable = !editing;
+                } else {
+                    div.classList.add('empty');
+                }
+                if (violSeats.has(seat.id)) div.classList.add('viol');
+                if (selected && selected.kind === 'seat' && selected.id === seat.id) div.classList.add('selected');
+
+                div.addEventListener('click', () => onSeatClick(seat.id));
+                div.addEventListener('dragstart', e => {
+                    if (editing || assignment[seat.id] === undefined) { e.preventDefault(); return; }
+                    e.dataTransfer.setData('text/plain', JSON.stringify({ kind: 'seat', id: seat.id }));
+                });
+                div.addEventListener('dragover', e => { if (!editing && !isDisabled) { e.preventDefault(); div.classList.add('dragover'); } });
+                div.addEventListener('dragleave', () => div.classList.remove('dragover'));
+                div.addEventListener('drop', e => {
+                    e.preventDefault();
+                    div.classList.remove('dragover');
+                    try {
+                        const src = JSON.parse(e.dataTransfer.getData('text/plain'));
+                        moveStudent(src, { kind: 'seat', id: seat.id });
+                    } catch (_) { /* ignorer ugyldig drop */ }
+                });
+                mapRoom.appendChild(div);
+            });
+        }
+
+        function positionEl(el, rect, scale) {
+            el.style.left = `${rect.x * scale}px`;
+            el.style.top = `${rect.y * scale}px`;
+            el.style.width = `${rect.w * scale}px`;
+            el.style.height = `${rect.h * scale}px`;
+        }
+
+        function renderTray() {
+            const placedIds = new Set(Object.values(assignment));
+            const unplaced = students.filter(s => !placedIds.has(s.id));
+            // Same opplysninga på papir, elles ser ikkje læraren at nokon manglar
+            $('print-unplaced').textContent = unplaced.length
+                ? `Utan plass: ${unplaced.map(s => s.formattedName).join(', ')}`
+                : '';
+            trayContainer.classList.toggle('hidden', unplaced.length === 0);
+            trayEl.innerHTML = '';
+            unplaced.forEach(stu => {
+                const chip = document.createElement('span');
+                chip.className = 'tray-chip';
+                chip.textContent = stu.formattedName;
+                if (selected && selected.kind === 'tray' && selected.id === stu.id) chip.classList.add('selected');
+                chip.draggable = true;
+                chip.addEventListener('click', () => onTrayClick(stu.id));
+                chip.addEventListener('dragstart', e => {
+                    e.dataTransfer.setData('text/plain', JSON.stringify({ kind: 'tray', id: stu.id }));
+                });
+                trayEl.appendChild(chip);
+            });
+        }
+
+        function renderViolations() {
+            const viols = findViolations();
+            violationsEl.innerHTML = '';
+            viols.forEach(v => {
+                const div = document.createElement('div');
+                div.className = 'viol-msg';
+                div.textContent = v.msg;
+                violationsEl.appendChild(div);
+            });
+        }
+
+        // ---------- Flytting (klikk og dra) ----------
+        function unitOf(seatId) {
+            // Bordeininga: paret i tobord, gruppa i firarbord, benken i eige rom, elles enkeltbordet
+            return (preset === 'par' || preset === 'firar' || preset === 'custom')
+                ? seatId.split('-').slice(0, 3).join('-')
+                : seatId;
+        }
+
+        function onSeatClick(seatId) {
+            if (editMode !== 'off') {
+                const ids = editMode === 'unit'
+                    ? layout.seats.filter(s => unitOf(s.id) === unitOf(seatId)).map(s => s.id)
+                    : [seatId];
+                const anyActive = ids.some(id => !disabledSeats.has(id));
+                snapshot();
+                ids.forEach(id => {
+                    if (anyActive) { disabledSeats.add(id); delete assignment[id]; }
+                    else disabledSeats.delete(id);
+                });
+                // Elevane som mista plassen skal setjast der det er ledig,
+                // og nye plassar skal takast i bruk av dei som står utan
+                placeUnseated();
+                manualEdits = true;
+                renderAll();
+                return;
+            }
+            if (disabledSeats.has(seatId)) return;
+            if (!selected) {
+                if (assignment[seatId] !== undefined) { selected = { kind: 'seat', id: seatId }; renderAll(); }
+                return;
+            }
+            if (selected.kind === 'seat' && selected.id === seatId) { selected = null; renderAll(); return; }
+            moveStudent(selected, { kind: 'seat', id: seatId });
+        }
+
+        function onTrayClick(stuId) {
+            // Å velje ein elev utan plass er ei plassering, ikkje bordredigering
+            if (editMode !== 'off') { setEditMode('off'); }
+            if (!selected) { selected = { kind: 'tray', id: stuId }; renderAll(); return; }
+            if (selected.kind === 'tray' && selected.id === stuId) { selected = null; renderAll(); return; }
+            if (selected.kind === 'seat') {
+                // Elev frå bord byter med elev i lista
+                snapshot();
+                manualEdits = true;
+                const seatStu = assignment[selected.id];
+                assignment[selected.id] = stuId;
+                void seatStu; // den andre hamnar automatisk i lista
+                selected = null;
+                renderAll();
+                return;
+            }
+            selected = { kind: 'tray', id: stuId };
+            renderAll();
+        }
+
+        function moveStudent(src, dst) {
+            snapshot();
+            manualEdits = true;
+            if (src.kind === 'seat' && dst.kind === 'seat') {
+                const a = assignment[src.id], b = assignment[dst.id];
+                if (a === undefined) { selected = null; renderAll(); return; }
+                if (b === undefined) { delete assignment[src.id]; assignment[dst.id] = a; }
+                else { assignment[src.id] = b; assignment[dst.id] = a; }
+            } else if (src.kind === 'tray' && dst.kind === 'seat') {
+                assignment[dst.id] = src.id; // evt. tidlegare elev hamnar i lista
+            }
+            selected = null;
+            renderAll();
+        }
+
+        // ---------- PNG-eksport ----------
+        async function exportPNG() {
+            await document.fonts.ready;
+            const L = computeLayout();
+            const margin = 90, titleBand = 110;
+            const targetW = 2000;
+            const scale = (targetW - 2 * margin) / L.roomW;
+            const canvas = document.createElement('canvas');
+            canvas.width = targetW;
+            canvas.height = Math.round(L.roomH * scale + 2 * margin + titleBand);
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#F6F1E6';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Tittel og dato
+            ctx.fillStyle = '#15202B';
+            ctx.font = `600 46px 'Space Grotesk', sans-serif`;
+            ctx.textBaseline = 'top';
+            ctx.fillText(titleDisplay.textContent, margin, 34);
+            ctx.fillStyle = '#6B6F77';
+            ctx.font = `400 24px 'JetBrains Mono', monospace`;
+            ctx.fillText(dateDisplay.textContent, margin, 92);
+
+            const ox = margin, oy = margin + titleBand;
+
+            // Romvegger + golv
+            ctx.fillStyle = '#FCFAF4';
+            ctx.fillRect(ox, oy, L.roomW * scale, L.roomH * scale);
+            ctx.strokeStyle = '#15202B';
+            ctx.lineWidth = 5;
+            ctx.strokeRect(ox, oy, L.roomW * scale, L.roomH * scale);
+
+            const drawRect = (r, fill, stroke, radius) => {
+                const x = ox + r.x * scale, y = oy + r.y * scale, w = r.w * scale, h = r.h * scale;
+                ctx.beginPath();
+                ctx.roundRect(x, y, w, h, radius);
+                ctx.fillStyle = fill; ctx.fill();
+                ctx.strokeStyle = stroke; ctx.lineWidth = 2.5; ctx.stroke();
+                return { x, y, w, h };
+            };
+
+            const labelIn = (rect, text, color, vertical) => {
+                ctx.save();
+                ctx.fillStyle = color;
+                ctx.font = `600 ${Math.min(22, rect.h * 0.6, rect.w * 0.6)}px 'Space Grotesk', sans-serif`;
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.translate(rect.x + rect.w / 2, rect.y + rect.h / 2);
+                if (vertical) ctx.rotate(-Math.PI / 2);
+                ctx.fillText(text, 0, 0);
+                ctx.restore();
+            };
+
+            const tRect = drawRect(L.tavle, '#15202B', '#15202B', 4);
+            labelIn(tRect, 'TAVLE', '#98D3B4', L.tavle.vertical);
+            L.dors.forEach(dor => {
+                const dRect = drawRect(dor, '#EBDDC3', '#C9B282', 3);
+                labelIn(dRect, 'DØR', '#7A5C2E', dor.vertical);
+            });
+
+            // Bord
+            L.seats.forEach(seat => {
+                if (disabledSeats.has(seat.id)) return;
+                const stuId = assignment[seat.id];
+                const r = drawRect(seat, stuId !== undefined ? '#ffffff' : '#FCFAF4', stuId !== undefined ? '#55606B' : '#C9C2B2', 6);
+                if (stuId === undefined) return;
+                const stu = students.find(s => s.id === stuId);
+                ctx.textAlign = 'center';
+                ctx.fillStyle = '#1F2933';
+                const showLast = showLastToggle.checked;
+                const line1 = showLast ? stu.firstName : stu.firstName + (stu.shortLast ? ` ${stu.shortLast}` : '');
+                const line2 = showLast ? (stu.lastName || '') : '';
+                let fs = r.h * 0.3;
+                ctx.font = `600 ${fs}px 'Source Sans 3', sans-serif`;
+                while (ctx.measureText(line1).width > r.w - 12 && fs > 9) { fs -= 1; ctx.font = `600 ${fs}px 'Source Sans 3', sans-serif`; }
+                if (line2) {
+                    ctx.textBaseline = 'alphabetic';
+                    ctx.fillText(line1, r.x + r.w / 2, r.y + r.h / 2 - 4);
+                    ctx.fillStyle = '#6B6F77';
+                    let fs2 = fs * 0.82;
+                    ctx.font = `400 ${fs2}px 'Source Sans 3', sans-serif`;
+                    while (ctx.measureText(line2).width > r.w - 12 && fs2 > 8) { fs2 -= 1; ctx.font = `400 ${fs2}px 'Source Sans 3', sans-serif`; }
+                    ctx.textBaseline = 'top';
+                    ctx.fillText(line2, r.x + r.w / 2, r.y + r.h / 2 + 2);
+                } else {
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(line1, r.x + r.w / 2, r.y + r.h / 2);
+                }
+            });
+
+            const link = document.createElement('a');
+            const slug = (titleInput.value.trim() || 'klassekart').toLowerCase().replace(/[^a-z0-9æøå]+/gi, '-').replace(/^-|-$/g, '');
+            link.download = `${slug}-${new Date().toISOString().slice(0, 10)}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+
+        // ---------- Angre ----------
+        // Held på plassering og utkryssa bord. Endringar i sjølve elevlista
+        // tømmer historikken, sidan ei angring då kunne peike på elevar som er borte.
+        function snapshot() {
+            undoStack.push({ assignment: Object.assign({}, assignment), disabled: [...disabledSeats] });
+            if (undoStack.length > 20) undoStack.shift();
+            updateUndoButton();
+        }
+
+        function undo() {
+            const prev = undoStack.pop();
+            if (!prev) return;
+            assignment = prev.assignment;
+            disabledSeats = new Set(prev.disabled);
+            selected = null;
+            updateUndoButton();
+            renderAll();
+        }
+
+        function clearUndo() { undoStack = []; updateUndoButton(); }
+
+        function updateUndoButton() {
+            const btn = $('undo-button');
+            btn.disabled = undoStack.length === 0;
+            btn.title = undoStack.length ? `Angre siste endring (${undoStack.length} steg lagra)` : 'Ingenting å angre';
+        }
+
+        $('undo-button').addEventListener('click', undo);
+        document.addEventListener('keydown', e => {
+            if (!(e.key === 'z' || e.key === 'Z') || !(e.metaKey || e.ctrlKey) || e.shiftKey) return;
+            const t = e.target;
+            if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+            if (step2Container.classList.contains('hidden')) return;
+            e.preventDefault();
+            undo();
+        });
+
+        // ---------- Kom i gang ----------
+        const helpDialog = $('help-dialog');
+        $('help-guide-link').href = GUIDE_URL;
+        $('help-button').addEventListener('click', () => openHelp());
+        $('help-close').addEventListener('click', () => helpDialog.close());
+
+        function openHelp() {
+            if (typeof helpDialog.showModal === 'function') helpDialog.showModal();
+            else helpDialog.setAttribute('open', '');
+        }
+
+        // Vis av seg sjølv fyrste gongen — men berre om vi faktisk kan hugse
+        // at brukaren har sett han, elles ville han dukka opp kvar einaste gong.
+        function maybeShowHelpOnFirstVisit() {
+            let seen = null, canRemember = false;
+            try {
+                seen = localStorage.getItem(SEEN_KEY);
+                localStorage.setItem(SEEN_KEY, seen === null ? 'nei' : seen);
+                canRemember = true;
+            } catch (e) { canRemember = false; }
+            if (!canRemember || seen === 'ja') return;
+            openHelp();
+        }
+        helpDialog.addEventListener('close', () => {
+            try { localStorage.setItem(SEEN_KEY, 'ja'); } catch (e) { /* lagring blokkert */ }
+        });
+
+        updateInputUI();
+        refreshSavedLists();
+        editHint.textContent = '💡 Dra ein elev til eit anna bord, eller klikk på to bord for å byte plass.';
+        maybeShowHelpOnFirstVisit();
+    </script>
+</body>
+</html>
